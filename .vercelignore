@@ -1,14 +1,8 @@
-node_modules/
-dist/
-*.tsbuildinfo
-.DS_Store
-.vercel/
 Raycast.mhtml
 ankistats.pdf
 anki-connect/
 anki-connect plugin/
-__pycache__/
+.git/
+node_modules/
 test-results/
 playwright-report/
-.vercel
-.env*
