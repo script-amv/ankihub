@@ -1,6 +1,6 @@
 # Release notes
 
-## v0.2.0 — unreleased
+## v0.2.0 — 2026-09-08
 
 - Automatic connection with one Connect/Refresh button and completed-deck progress inside it.
 - Labeled demo fallback after initial failure; failed refreshes preserve stale live data.
