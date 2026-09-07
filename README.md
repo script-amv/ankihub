@@ -50,6 +50,7 @@ Data refreshes when you connect or press **Refresh**. Reloading the page returns
 | Symptom | What to check |
 | --- | --- |
 | Can't reach Anki | Anki is open on this computer; AnkiConnect listens at `127.0.0.1:8765`. |
+| Loading pauses on macOS | Bring Anki to the foreground and retry. Background Anki can respond slowly. Large histories also take longer to load. |
 | Connection blocked | The exact site origin is allowed in AnkiConnect; restart Anki after changing its config. |
 | Browser permission denied | Allow local-network access in the site's browser permissions, then reconnect. |
 | Invalid key | Enter the API key configured in AnkiConnect. |
