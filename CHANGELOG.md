@@ -1,5 +1,14 @@
 # Release notes
 
+## v0.2.0 — 2026-09-08
+
+- Automatic connection with one Connect/Refresh button and completed-deck progress inside it.
+- Labeled demo fallback after initial failure; failed refreshes preserve stale live data.
+- Searchable glass deck picker and matching history-period dropdown with keyboard navigation.
+- Rolling last-7-day, last-30-day, last-6-month, and last-year history views.
+- Cards learned now counts unique cards by their first recorded learning date, including today's new-card metric.
+- Removed settings and API-key entry; today's day boundary is fixed at 04:00 local time.
+
 ## v0.1.0
 
 The first public release of AnkiHub: a quiet dashboard for your daily Anki practice.

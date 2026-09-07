@@ -1,8 +1,9 @@
 import type { Deck, Review, Snapshot } from './stats';
-export async function invoke<T>(action: string, params: object = {}, key = '', signal?: AbortSignal): Promise<T> {
+export type LoadProgress = { phase: 'connecting' } | { phase: 'scanning'; completed: number; total: number };
+export async function invoke<T>(action: string, params: object = {}, signal?: AbortSignal): Promise<T> {
   let response: Response;
   try {
-    response = await fetch('http://127.0.0.1:8765', { method: 'POST', body: JSON.stringify({ action, version: 6, params, ...(key ? { key } : {}) }), signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(60000)]) : AbortSignal.timeout(60000) });
+    response = await fetch('http://127.0.0.1:8765', { method: 'POST', body: JSON.stringify({ action, version: 6, params }), signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(60000)]) : AbortSignal.timeout(60000) });
   } catch (error) {
     if (signal?.aborted) throw error;
     throw new Error('Can’t reach Anki. Open Anki on this computer and check that AnkiConnect is enabled.');
@@ -13,9 +14,9 @@ export async function invoke<T>(action: string, params: object = {}, key = '', s
   if (!Object.hasOwn(json, 'result')) throw new Error('AnkiConnect returned an unexpected response.');
   return json.result as T;
 }
-export async function loadSnapshot(key: string, signal: AbortSignal, progress: (message: string) => void): Promise<Snapshot> {
-  const call = <T,>(action: string, params = {}) => invoke<T>(action, params, key, signal);
-  progress('Connecting to Anki…');
+export async function loadSnapshot(signal: AbortSignal, progress: (message: LoadProgress) => void): Promise<Snapshot> {
+  const call = <T,>(action: string, params = {}) => invoke<T>(action, params, signal);
+  progress({ phase: 'connecting' });
   const version = await call<number>('version');
   if (version < 6) throw new Error('Update AnkiConnect to API version 6 to use this dashboard.');
   const profile = await call<string>('getActiveProfile');
@@ -23,12 +24,13 @@ export async function loadSnapshot(key: string, signal: AbortSignal, progress: (
   const names = Object.keys(deckIds);
   const stats = names.length ? await call<Record<string, Deck>>('getDeckStats', { decks: names }) : {};
   const reviews: Record<string, Review[]> = {};
+  progress({ phase: 'scanning', completed: 0, total: names.length });
   // cardReviews matches one exact deck ID, so fetch every deck, including children.
   for (const [i, deck] of names.entries()) {
-    progress(`Reading history · ${i + 1} of ${names.length} decks`);
     const rows = await call<Review[]>('cardReviews', { deck, startID: 0 });
     if (!Array.isArray(rows) || rows.some(r => !Array.isArray(r) || r.length !== 9 || r.some(n => typeof n !== 'number'))) throw new Error('Anki returned an unsupported review history format.');
     reviews[deck] = rows;
+    progress({ phase: 'scanning', completed: i + 1, total: names.length });
   }
   if (await call<string>('getActiveProfile') !== profile) throw new Error('Your Anki profile changed while loading. Refresh to try again.');
   // Scheduler tree names can be leaf-only; use the canonical names from the ID map.

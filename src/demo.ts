@@ -4,11 +4,11 @@ import { dayStart, type Review, type Snapshot } from './stats';
 export function createDemo(now = Date.now()): Snapshot {
   const start = dayStart(now, 4);
   const history: Review[] = Array.from({ length: 12480 }, (_, i) => [
-    start - (12480 - i) * 600000, i, 0, i % 11 === 0 ? 1 : 3,
-    4, 1, 2500, 18000 + (i % 9) * 1000, i % 7 === 0 ? 0 : 1,
+    start - (12480 - i) * 3600000, Math.floor(i / 7), 0, i % 11 === 0 ? 1 : 3,
+    4, 1, 2500, 18000 + (i % 9) * 1000, i % 7 < 2 ? 0 : 1,
   ]);
   const today: Review[] = Array.from({ length: 186 }, (_, i) => [
-    start + Math.floor((now - start) * (i + 1) / 187), 20000 + i, 0,
+    start + Math.floor((now - start) * (i + 1) / 187), i < 24 ? 20000 + Math.floor(i / 2) : i, 0,
     i % 13 === 0 ? 1 : 3, 4, 1, 2500, 18000 + (i % 9) * 1000, i < 24 ? 0 : 1,
   ]);
   return {
